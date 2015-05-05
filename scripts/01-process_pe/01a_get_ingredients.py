@@ -12,7 +12,7 @@ from openpyxl import Workbook, load_workbook
 
 def main():
     # path to folder peData folder
-    dir_path = '..' + os.sep + '..' + os.sep + 'data' + os.sep + os.sep + 'peData' + os.sep
+    dir_path = '..' + os.sep + '..' + os.sep + 'data' + os.sep + 'peData' + os.sep
 
     # path for excel files
     input_file_path = dir_path + 'transactions.xlsx'

@@ -148,7 +148,7 @@ def process_dir(data_dir_path, output_file_path):
 def main():
 
     # path to folder peData folder
-    dir_path = '..' + os.sep + '..' + os.sep + 'data' + os.sep + os.sep + 'peData' + os.sep
+    dir_path = '..' + os.sep + '..' + os.sep + 'data' + os.sep + 'peData' + os.sep
     # path to folder for data files
     data_dir_path = dir_path + os.sep + 'daily_transactions' + os.sep
     # path fot output file
