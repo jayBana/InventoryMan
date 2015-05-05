@@ -152,7 +152,7 @@ def main():
     # path to folder for data files
     data_dir_path = dir_path + os.sep + 'daily_transactions' + os.sep
     # path fot output file
-    output_file_path = dir_path + 'transactions.xlsx'
+    output_file_path = dir_path + 'daily_transactions.xlsx'
 
     # process files
     process_dir(data_dir_path, output_file_path)

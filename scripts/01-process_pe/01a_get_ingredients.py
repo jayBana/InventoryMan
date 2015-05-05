@@ -15,8 +15,8 @@ def main():
     dir_path = '..' + os.sep + '..' + os.sep + 'data' + os.sep + 'peData' + os.sep
 
     # path for excel files
-    input_file_path = dir_path + 'transactions.xlsx'
-    output_file_path = dir_path + 'ingredients.xlsx'
+    input_file_path = dir_path + 'daily_transactions.xlsx'
+    output_file_path = dir_path + 'ingredient_list.xlsx'
 
     # load transactions workbook
     wb = load_workbook(input_file_path)
@@ -62,7 +62,7 @@ def main():
         ws_ingredients.append(row)
         
     # dump ingredients dict as a json
-    with open(dir_path + 'ingredients.json', 'w', encoding='utf-8') as fp:
+    with open(dir_path + 'ingredient_list.json', 'w', encoding='utf-8') as fp:
         json.dump(ingredients, fp)
 
     # save our ingredients workbook
