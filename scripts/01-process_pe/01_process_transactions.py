@@ -5,14 +5,11 @@ this script merges all excel files together and separates
 sections in each file and adds them to the appropriate sheet
 '''
 
-import sys
 import os
 import xlrd
 from os.path import isfile, join, basename
 from posix import listdir
 from openpyxl.workbook import Workbook
-from openpyxl.reader.excel import load_workbook, InvalidFileException
-
 
 '''
 merge files to one workbook
