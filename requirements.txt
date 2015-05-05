@@ -1,1 +1,3 @@
 ipython[all]
+openpyxl
+xlrd
