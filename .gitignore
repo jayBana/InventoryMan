@@ -180,3 +180,5 @@ crashlytics-build.properties
 pyvenv.cfg
 pip-selfcheck.json
 
+### Own ignore settings ###
+/data/peData/
