@@ -11,9 +11,26 @@ from posix import listdir
 from datetime import datetime, timedelta, date
 from openpyxl import load_workbook
 
-# loads all weather data related infor from jsons to dict
-def load_weather(file_path):
+# loads all events related data from xlsx
+def load_events(file_path):
+    # load events excel files
+    wb_event = load_workbook(file_path)
+    ws_event = wb_event.get_active_sheet()
 
+    # get venue name
+    venue_name = file_path.split('_')[1].replace('-', ' ').title().split('.')[0]
+
+    # add days when there is an event to a set
+    event_dates = (venue_name, set())
+    for r in range(2, ws_event.get_highest_row() + 1):
+        date_string = ws_event.cell(row=r, column=1).value
+        event_dates[1].add(date_string)
+
+    events.append(event_dates)
+
+
+# loads all weather related data from jsons to dict
+def load_weather(file_path):
     # open json
     with open(file_path, encoding='utf-8') as data_file:
         data = json.load(data_file)
@@ -174,6 +191,20 @@ def load_all_data(data_dir_path):
     for f in only_files:
         load_weather(weather_data_dir_path + f)
 
+    ### EVENTS DATA ###
+    global events
+    events = []
+
+    # path for events data files
+    events_data_dir_path = data_dir_path + 'events' + os.sep
+
+    # get the list of files in the directory
+    only_files = [f for f in listdir(events_data_dir_path) if isfile(join(events_data_dir_path, f))]
+
+    # process each file
+    for f in only_files:
+        load_events(events_data_dir_path + f)
+
 
 # appends all data to each row in each file
 def append_all_data():
@@ -203,6 +234,8 @@ def append_all_data():
     ws.cell(row=1, column=highest_col + 19).value = 'Temp (celsius)'
     ws.cell(row=1, column=highest_col + 20).value = 'Precip (mm)'
     ws.cell(row=1, column=highest_col + 21).value = 'Wind speed (kmh)'
+    for i in range(len(events)):
+        ws.cell(row=1, column=highest_col + 22 + i).value = events[i][0]
 
     # do this for each row in column
     for r in range(2, highest_row + 1):
@@ -246,6 +279,10 @@ def append_all_data():
         ws.cell(row=r, column=highest_col + 19).value = weather_data[date_string][1]
         ws.cell(row=r, column=highest_col + 20).value = weather_data[date_string][2]
         ws.cell(row=r, column=highest_col + 21).value = weather_data[date_string][3]
+        # Events data
+        for i in range(len(events)):
+            ws.cell(row=r, column=highest_col + 22 + i).value = 1 if date_string in events[i][1] else 0
+
 
 def main():
     # path for data files
