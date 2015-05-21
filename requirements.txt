@@ -2,3 +2,4 @@ ipython[all]
 openpyxl
 xlrd
 pandas
+beautifulsoup4
