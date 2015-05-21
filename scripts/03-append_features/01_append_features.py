@@ -8,14 +8,74 @@ import os.path
 import json
 from os.path import isfile, join
 from posix import listdir
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from openpyxl import load_workbook
 
-'''
-function that adds sales data to sheet as well as date related information
-'''
+
+# loads all school holiday related info from json to a set
+def load_schooldays(file_path):
+    with open(file_path, encoding='utf-8') as data_file:
+        data = json.load(data_file)
+
+    school_days = set()
+
+    for entry in data:
+        start = entry['start'].split('-')
+        end = entry['end'].split('-')
+
+        start_date = date(int(start[0]), int(start[1]), int(start[2]))
+        end_date = date(int(end[0]), int(end[1]), int(end[2]))
+
+        delta = end_date - start_date
+
+        for d in range(delta.days + 1):
+            new_date = start_date + timedelta(days=d)
+            school_days.add(new_date.strftime("%Y-%m-%d"))
+
+    return school_days
 
 
+# appends all the holiday related info to each row in each file
+def append_holidays():
+    # bank holidays json path
+    bank_holidays_path = data_dir_path + 'holidays' + os.sep + 'england_bankHolidays.json'
+
+    # school holidays json path
+    city_days_path = data_dir_path + 'holidays' + os.sep + 'nottcity_SchoolHolidays.json'
+    county_days_path = data_dir_path + 'holidays' + os.sep + 'nottshire_SchoolHolidays.json'
+
+    # load bank holidays into a set
+    with open(bank_holidays_path, encoding='utf-8') as data_file:
+        data = json.load(data_file)
+    bank_holidays = set()
+    for entry in data:
+        # only the ones that are actual days offs
+        if entry['bunting']:
+            bank_holidays.add(entry['date'])
+
+    # load school dates into sets
+    city_days = load_schooldays(city_days_path)
+    county_days = load_schooldays(county_days_path)
+
+    # get sheet info
+    highest_col = ws.get_highest_column()
+    highest_row = ws.get_highest_row()
+
+    # create headers
+    ws.cell(row=1, column=highest_col + 1).value = 'Bank Holiday'
+    ws.cell(row=1, column=highest_col + 2).value = 'City School Holidays'
+    ws.cell(row=1, column=highest_col + 3).value = 'County School Holidays'
+
+    for r in range(2, highest_row + 1):
+        # get date string for row
+        date_string = ws.cell(row=r, column=1).value
+        # add values to cells
+        ws.cell(row=r, column=highest_col + 1).value = 1 if date_string in bank_holidays else 0
+        ws.cell(row=r, column=highest_col + 2).value = 0 if date_string in city_days else 1
+        ws.cell(row=r, column=highest_col + 3).value = 0 if date_string in county_days else 1
+
+
+# appends all sales and dates related data to each row in each file
 def append_sales():
     # daily sales json path
     daily_sales_path = data_dir_path + 'peData' + os.sep + 'daily_sale_figures.json'
@@ -94,6 +154,7 @@ def main():
 
         # append data
         append_sales()
+        append_holidays()
 
         # save workbook
         wb.save(input_file_name)
