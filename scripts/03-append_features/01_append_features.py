@@ -11,6 +11,84 @@ from posix import listdir
 from datetime import datetime, timedelta, date
 from openpyxl import load_workbook
 
+# appends all university (Uni of Nott & Trent) dates to each file
+def append_uni_dates():
+    # uni key dates json path
+    uni_key_dates_path = data_dir_path + 'holidays' + os.sep + 'uni_key-dates.json'
+
+    # open json and load info into sets
+    with open(uni_key_dates_path, encoding='utf-8') as data_file:
+        data = json.load(data_file)
+
+    # create sets for Uni of Nottingham
+    uon_welcome = set()
+    uon_term = set()
+    uon_graduation = set()
+    uon_exam = set()
+    uon_sets = [uon_welcome, uon_term, uon_graduation, uon_exam]
+
+    # create sets for Trent Uni
+    trent_welcome = set()
+    trent_term = set()
+    trent_graduation = set()
+    trent_exam = set()
+    trent_sets = [trent_welcome, trent_term, trent_graduation, trent_exam]
+
+    # add dates from json to set
+    for entry in data:
+        start = entry['start'].split('-')
+        end = entry['end'].split('-')
+
+        start_date = date(int(start[0]), int(start[1]), int(start[2]))
+        end_date = date(int(end[0]), int(end[1]), int(end[2]))
+        delta = end_date - start_date
+
+        for d in range(delta.days + 1):
+            new_date = start_date + timedelta(days=d)
+            add_date = new_date.strftime(("%Y-%m-%d"))
+
+            if entry['type'] == 'welcome':
+                index = 0
+            elif entry['type'] == 'term':
+                index = 1
+            elif entry['type'] == 'graduation':
+                index = 2
+            elif entry['type'] == 'exam':
+                index = 3
+
+            if entry['uni'] == 'uon':
+                uon_sets[index].add(add_date)
+            else:
+                trent_sets[index].add(add_date)
+
+    # get sheet info
+    highest_col = ws.get_highest_column()
+    highest_row = ws.get_highest_row()
+
+    # add headers
+    ws.cell(row=1, column=highest_col + 1).value = 'UoN Welcome Week'
+    ws.cell(row=1, column=highest_col + 2).value = 'UoN Term'
+    ws.cell(row=1, column=highest_col + 3).value = 'UoN Graduation'
+    ws.cell(row=1, column=highest_col + 4).value = 'UoN Exam'
+    ws.cell(row=1, column=highest_col + 5).value = 'Trent Welcome Week'
+    ws.cell(row=1, column=highest_col + 6).value = 'Trent Term'
+    ws.cell(row=1, column=highest_col + 7).value = 'Trent Graduation'
+    ws.cell(row=1, column=highest_col + 8).value = 'Trent Exam'
+
+    # for each row
+    for r in range(2, highest_row + 1):
+        # get row's date
+        row_date = ws.cell(row=r, column=1).value
+
+        ws.cell(row=r, column=highest_col + 1).value = 1 if row_date in uon_sets[0] else 0
+        ws.cell(row=r, column=highest_col + 2).value = 1 if row_date in uon_sets[1] else 0
+        ws.cell(row=r, column=highest_col + 3).value = 1 if row_date in uon_sets[2] else 0
+        ws.cell(row=r, column=highest_col + 4).value = 1 if row_date in uon_sets[3] else 0
+        ws.cell(row=r, column=highest_col + 5).value = 1 if row_date in trent_sets[0] else 0
+        ws.cell(row=r, column=highest_col + 6).value = 1 if row_date in trent_sets[1] else 0
+        ws.cell(row=r, column=highest_col + 7).value = 1 if row_date in trent_sets[2] else 0
+        ws.cell(row=r, column=highest_col + 8).value = 1 if row_date in trent_sets[3] else 0
+
 
 # loads all school holiday related info from json to a set
 def load_schooldays(file_path):
@@ -155,6 +233,7 @@ def main():
         # append data
         append_sales()
         append_holidays()
+        append_uni_dates()
 
         # save workbook
         wb.save(input_file_name)
