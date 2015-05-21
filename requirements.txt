@@ -1,3 +1,4 @@
 ipython[all]
 openpyxl
 xlrd
+pandas
