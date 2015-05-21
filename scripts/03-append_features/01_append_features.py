@@ -11,6 +11,26 @@ from posix import listdir
 from datetime import datetime, timedelta, date
 from openpyxl import load_workbook
 
+# loads all weather data related infor from jsons to dict
+def load_weather(file_path):
+
+    # open json
+    with open(file_path, encoding='utf-8') as data_file:
+        data = json.load(data_file)
+
+    # get only data that we are interested in and save it for each day
+    for entry in data['data']['weather']:
+        date_string = entry['date']
+        cloud_cover = entry['hourly'][0]['cloudcover']
+        temp = entry['hourly'][0]['FeelsLikeC']
+        precip = entry['hourly'][0]['precipMM']
+        wind_speed = entry['hourly'][0]['windspeedKmph']
+
+        # add weather data tuple to dict
+        e = (cloud_cover, temp, precip, wind_speed)
+        weather_data[date_string] = e
+
+
 # loads all school holiday related info from json to a set
 def load_schooldays(file_path):
     with open(file_path, encoding='utf-8') as data_file:
@@ -140,6 +160,20 @@ def load_all_data(data_dir_path):
             else:
                 trent_sets[index].add(add_date)
 
+    ### WEATHER DATA ###
+    global weather_data
+    weather_data = {}
+
+    # path for monthly weather data files
+    weather_data_dir_path = data_dir_path + 'weather' + os.sep
+
+    # get the list of files in the directory
+    only_files = [f for f in listdir(weather_data_dir_path) if isfile(join(weather_data_dir_path, f))]
+
+    # process each file
+    for f in only_files:
+        load_weather(weather_data_dir_path + f)
+
 
 # appends all data to each row in each file
 def append_all_data():
@@ -165,6 +199,10 @@ def append_all_data():
     ws.cell(row=1, column=highest_col + 15).value = 'Trent Term'
     ws.cell(row=1, column=highest_col + 16).value = 'Trent Graduation'
     ws.cell(row=1, column=highest_col + 17).value = 'Trent Exam'
+    ws.cell(row=1, column=highest_col + 18).value = 'Cloud Cover (%)'
+    ws.cell(row=1, column=highest_col + 19).value = 'Temp (celsius)'
+    ws.cell(row=1, column=highest_col + 20).value = 'Precip (mm)'
+    ws.cell(row=1, column=highest_col + 21).value = 'Wind speed (kmh)'
 
     # do this for each row in column
     for r in range(2, highest_row + 1):
@@ -203,7 +241,11 @@ def append_all_data():
         ws.cell(row=r, column=highest_col + 15).value = 1 if date_string in trent_sets[1] else 0
         ws.cell(row=r, column=highest_col + 16).value = 1 if date_string in trent_sets[2] else 0
         ws.cell(row=r, column=highest_col + 17).value = 1 if date_string in trent_sets[3] else 0
-
+        # Weather data
+        ws.cell(row=r, column=highest_col + 18).value = weather_data[date_string][0]
+        ws.cell(row=r, column=highest_col + 19).value = weather_data[date_string][1]
+        ws.cell(row=r, column=highest_col + 20).value = weather_data[date_string][2]
+        ws.cell(row=r, column=highest_col + 21).value = weather_data[date_string][3]
 
 def main():
     # path for data files
