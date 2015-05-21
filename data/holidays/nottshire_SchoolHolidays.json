@@ -1,0 +1,184 @@
+[
+
+{
+
+    "start": "2013-09-04",
+    "end": "2013-10-18",
+    "term_number": "1",
+    "start_year": "2013",
+    "date_id": "404922",
+    "label": "Autumn Term"
+
+},
+{
+
+    "start": "2013-10-28",
+    "end": "2013-12-20",
+    "term_number": "2",
+    "start_year": "2013",
+    "date_id": "404923",
+    "label": "Autumn Term"
+
+},
+{
+
+    "start": "2014-01-06",
+    "end": "2014-02-14",
+    "term_number": "3",
+    "start_year": "2013",
+    "date_id": "404924",
+    "label": "Spring Term"
+
+},
+{
+
+    "start": "2014-02-24",
+    "end": "2014-04-04",
+    "term_number": "4",
+    "start_year": "2013",
+    "date_id": "404925",
+    "label": "Spring Term"
+
+},
+{
+
+    "start": "2014-04-22",
+    "end": "2014-05-23",
+    "term_number": "5",
+    "start_year": "2013",
+    "date_id": "404926",
+    "label": "Summer Term"
+
+},
+{
+
+    "start": "2014-06-02",
+    "end": "2014-07-23",
+    "term_number": "6",
+    "start_year": "2013",
+    "date_id": "404927",
+    "label": "Summer Term"
+
+},
+
+{
+
+    "start": "2014-09-03",
+    "end": "2014-10-24",
+    "term_number": "1",
+    "start_year": "2014",
+    "date_id": "404922",
+    "label": "Autumn Term"
+
+},
+{
+
+    "start": "2014-11-03",
+    "end": "2014-12-19",
+    "term_number": "2",
+    "start_year": "2014",
+    "date_id": "404923",
+    "label": "Autumn Term"
+
+},
+{
+
+    "start": "2015-01-05",
+    "end": "2015-02-13",
+    "term_number": "3",
+    "start_year": "2014",
+    "date_id": "404924",
+    "label": "Spring Term"
+
+},
+{
+
+    "start": "2015-02-23",
+    "end": "2015-04-02",
+    "term_number": "4",
+    "start_year": "2014",
+    "date_id": "404925",
+    "label": "Spring Term"
+
+},
+{
+
+    "start": "2015-04-20",
+    "end": "2015-05-22",
+    "term_number": "5",
+    "start_year": "2014",
+    "date_id": "404926",
+    "label": "Summer Term"
+
+},
+{
+
+    "start": "2015-06-01",
+    "end": "2015-07-22",
+    "term_number": "6",
+    "start_year": "2014",
+    "date_id": "404927",
+    "label": "Summer Term"
+
+},
+{
+
+    "start": "2015-09-03",
+    "end": "2015-10-23",
+    "term_number": "1",
+    "start_year": "2015",
+    "date_id": "406987",
+    "label": "Autumn Term"
+
+},
+{
+
+    "start": "2015-11-02",
+    "end": "2015-12-18",
+    "term_number": "2",
+    "start_year": "2015",
+    "date_id": "406989",
+    "label": "Autumn Term"
+
+},
+{
+
+    "start": "2016-01-05",
+    "end": "2016-02-12",
+    "term_number": "3",
+    "start_year": "2015",
+    "date_id": "406991",
+    "label": "Spring Term"
+
+},
+{
+
+    "start": "2016-02-22",
+    "end": "2016-04-01",
+    "term_number": "4",
+    "start_year": "2015",
+    "date_id": "406993",
+    "label": "Spring Term"
+
+},
+{
+
+    "start": "2016-04-18",
+    "end": "2016-05-27",
+    "term_number": "5",
+    "start_year": "2015",
+    "date_id": "406995",
+    "label": "Summer Term"
+
+},
+
+    {
+        "start": "2016-06-06",
+        "end": "2016-07-25",
+        "term_number": "6",
+        "start_year": "2015",
+        "date_id": "406997",
+        "label": "Summer Term"
+    }
+
+]
