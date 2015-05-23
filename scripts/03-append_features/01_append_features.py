@@ -6,6 +6,7 @@ script that appends features to each ingredient and product file
 
 import os.path
 import json
+import pandas as pd
 from os.path import isfile, join
 from posix import listdir
 from datetime import datetime, timedelta, date
@@ -26,6 +27,7 @@ def load_events(file_path):
         date_string = ws_event.cell(row=r, column=1).value
         event_dates[1].add(date_string)
 
+    # add tuple to list of events
     events.append(event_dates)
 
 
@@ -50,20 +52,23 @@ def load_weather(file_path):
 
 # loads all school holiday related info from json to a set
 def load_schooldays(file_path):
+    # open json
     with open(file_path, encoding='utf-8') as data_file:
         data = json.load(data_file)
 
+    # set to hold school days
     school_days = set()
 
+    # save each date to appropriate set
     for entry in data:
+        # get start and end date and calculate the number of days between them
         start = entry['start'].split('-')
         end = entry['end'].split('-')
-
         start_date = date(int(start[0]), int(start[1]), int(start[2]))
         end_date = date(int(end[0]), int(end[1]), int(end[2]))
-
         delta = end_date - start_date
 
+        # create and add new date between start and end
         for d in range(delta.days + 1):
             new_date = start_date + timedelta(days=d)
             school_days.add(new_date.strftime("%Y-%m-%d"))
@@ -152,13 +157,14 @@ def load_all_data(data_dir_path):
 
     # add dates from json to set
     for entry in data:
+        # get start and end date and calculate the number of days between them
         start = entry['start'].split('-')
         end = entry['end'].split('-')
-
         start_date = date(int(start[0]), int(start[1]), int(start[2]))
         end_date = date(int(end[0]), int(end[1]), int(end[2]))
         delta = end_date - start_date
 
+        # save dates into sets for each entry
         for d in range(delta.days + 1):
             new_date = start_date + timedelta(days=d)
             add_date = new_date.strftime(("%Y-%m-%d"))
@@ -208,80 +214,76 @@ def load_all_data(data_dir_path):
 
 # appends all data to each row in each file
 def append_all_data():
-    # get sheet info
-    highest_col = ws.get_highest_column()
-    highest_row = ws.get_highest_row()
-
-    # create headers
-    ws.cell(row=1, column=highest_col + 1).value = 'Daily Sales'
-    ws.cell(row=1, column=highest_col + 2).value = 'Weekly Sales'
-    ws.cell(row=1, column=highest_col + 3).value = 'Day'
-    ws.cell(row=1, column=highest_col + 4).value = 'Week Number'
-    ws.cell(row=1, column=highest_col + 5).value = 'Year Day'
-    ws.cell(row=1, column=highest_col + 6).value = 'Weekend'
-    ws.cell(row=1, column=highest_col + 7).value = 'Bank Holiday'
-    ws.cell(row=1, column=highest_col + 8).value = 'City School Holidays'
-    ws.cell(row=1, column=highest_col + 9).value = 'County School Holidays'
-    ws.cell(row=1, column=highest_col + 10).value = 'UoN Welcome Week'
-    ws.cell(row=1, column=highest_col + 11).value = 'UoN Term'
-    ws.cell(row=1, column=highest_col + 12).value = 'UoN Graduation'
-    ws.cell(row=1, column=highest_col + 13).value = 'UoN Exam'
-    ws.cell(row=1, column=highest_col + 14).value = 'Trent Welcome Week'
-    ws.cell(row=1, column=highest_col + 15).value = 'Trent Term'
-    ws.cell(row=1, column=highest_col + 16).value = 'Trent Graduation'
-    ws.cell(row=1, column=highest_col + 17).value = 'Trent Exam'
-    ws.cell(row=1, column=highest_col + 18).value = 'Cloud Cover (%)'
-    ws.cell(row=1, column=highest_col + 19).value = 'Temp (celsius)'
-    ws.cell(row=1, column=highest_col + 20).value = 'Precip (mm)'
-    ws.cell(row=1, column=highest_col + 21).value = 'Wind speed (kmh)'
+    global df, date_string
+    # create index and headers
+    # index is a range of dates starting from the first entry of the workbook to the last one
+    index = pd.date_range(df.index[0], df.index[-1])
+    columns = ['Daily Sales', 'Weekly Sales', 'Day', 'Week Number', 'Year Day', 'Weekend',
+               'Bank Holiday', 'City School Holidays', 'County School Holidays', 'UoN Welcome Week', 'UoN Term',
+               'UoN Graduation', 'UoN Exam', 'Trent Welcome Week', 'Trent Term', 'Trent Graduation', 'Trent Exam',
+               'Cloud Cover (%)', 'Temp (celsius)', 'Precip (mm)', 'Wind speed (kmh)']
+    # add events header
     for i in range(len(events)):
-        ws.cell(row=1, column=highest_col + 22 + i).value = events[i][0]
+        columns.append(events[i][0])
 
-    # do this for each row in column
-    for r in range(2, highest_row + 1):
+    # create empty data frame
+    df_ = pd.DataFrame(index=index, columns=columns)
+    # join this empty data frame to existing one (our excel workbook)
+    df = df.join(df_)
+
+    # do this for each row
+    for i in range(len(df.index)):
         # get date for row
-        date_string = ws.cell(row=r, column=1).value
-        # create date object from string
-        d_date = datetime.strptime(date_string, "%Y-%m-%d").date()
-        # create key from date object (YYYY-MM format)
-        week_sales_key = str(d_date.isocalendar()[0]) + '-' + str(d_date.isocalendar()[1])
-        week_no = d_date.isocalendar()[1]
+        d_date = df.index[i]
+        # create ISO 8601
+        date_string = d_date.strftime("%Y-%m-%d")
         day_no = d_date.isoweekday()
-        d_sales = daily_sales[date_string]
-        w_sales = weekly_sales[week_sales_key]
         y_day = d_date.timetuple().tm_yday
         weekend = 1 if (day_no == 6 or day_no == 7) else 0
+        # get sales based on year and week number
+        week_no = d_date.isocalendar()[1]
+        week_sales_key = str(d_date.isocalendar()[0]) + '-' + week_no
+
+        # create sales daily and weekly sales
+        d_sales = daily_sales[date_string]
+        w_sales = weekly_sales[week_sales_key]
 
         # sales
-        ws.cell(row=r, column=highest_col + 1).value = d_sales
-        ws.cell(row=r, column=highest_col + 2).value = w_sales
+        df.ix[d_date, 1] = d_sales
+        df.ix[d_date, 2] = w_sales
         # date info
-        ws.cell(row=r, column=highest_col + 3).value = day_no
-        ws.cell(row=r, column=highest_col + 4).value = week_no
-        ws.cell(row=r, column=highest_col + 5).value = y_day
-        ws.cell(row=r, column=highest_col + 6).value = weekend
+        df.ix[d_date, 3] = day_no
+        df.ix[d_date, 4] = week_no
+        df.ix[d_date, 5] = y_day
+        df.ix[d_date, 6] = weekend
         # holidays
-        ws.cell(row=r, column=highest_col + 7).value = 1 if date_string in bank_holidays else 0
-        ws.cell(row=r, column=highest_col + 8).value = 0 if date_string in city_days else 1
-        ws.cell(row=r, column=highest_col + 9).value = 0 if date_string in county_days else 1
+        df.ix[d_date, 7] = 1 if date_string in bank_holidays else 0
+        df.ix[d_date, 8] = 0 if date_string in city_days else 1
+        df.ix[d_date, 9] = 0 if date_string in county_days else 1
         # Uni of Nott key dates
-        ws.cell(row=r, column=highest_col + 10).value = 1 if date_string in uon_sets[0] else 0
-        ws.cell(row=r, column=highest_col + 11).value = 1 if date_string in uon_sets[1] else 0
-        ws.cell(row=r, column=highest_col + 12).value = 1 if date_string in uon_sets[2] else 0
-        ws.cell(row=r, column=highest_col + 13).value = 1 if date_string in uon_sets[3] else 0
+        df.ix[d_date, 10] = 1 if date_string in uon_sets[0] else 0
+        df.ix[d_date, 11] = 1 if date_string in uon_sets[1] else 0
+        df.ix[d_date, 12] = 1 if date_string in uon_sets[2] else 0
+        df.ix[d_date, 13] = 1 if date_string in uon_sets[3] else 0
         # Trent uni key dates
-        ws.cell(row=r, column=highest_col + 14).value = 1 if date_string in trent_sets[0] else 0
-        ws.cell(row=r, column=highest_col + 15).value = 1 if date_string in trent_sets[1] else 0
-        ws.cell(row=r, column=highest_col + 16).value = 1 if date_string in trent_sets[2] else 0
-        ws.cell(row=r, column=highest_col + 17).value = 1 if date_string in trent_sets[3] else 0
+        df.ix[d_date, 14] = 1 if date_string in trent_sets[0] else 0
+        df.ix[d_date, 15] = 1 if date_string in trent_sets[1] else 0
+        df.ix[d_date, 16] = 1 if date_string in trent_sets[2] else 0
+        df.ix[d_date, 17] = 1 if date_string in trent_sets[3] else 0
         # Weather data
-        ws.cell(row=r, column=highest_col + 18).value = weather_data[date_string][0]
-        ws.cell(row=r, column=highest_col + 19).value = weather_data[date_string][1]
-        ws.cell(row=r, column=highest_col + 20).value = weather_data[date_string][2]
-        ws.cell(row=r, column=highest_col + 21).value = weather_data[date_string][3]
+        df.ix[d_date, 18] = weather_data[date_string][0]
+        df.ix[d_date, 19] = weather_data[date_string][1]
+        df.ix[d_date, 20] = weather_data[date_string][2]
+        df.ix[d_date, 21] = weather_data[date_string][3]
         # Events data
-        for i in range(len(events)):
-            ws.cell(row=r, column=highest_col + 22 + i).value = 1 if date_string in events[i][1] else 0
+        for c in range(len(events)):
+            df.ix[d_date, 22 + c] = 1 if date_string in events[c][1] else 0
+
+    # rename and move units used to the end
+    df.rename(columns={df.columns[0]: 'Target'}, inplace=True)
+    cols = df.columns.tolist()
+    cols = cols[1:] + cols[:1]
+    df = df[cols]
 
 
 def main():
@@ -295,11 +297,12 @@ def main():
     only_files = [f for f in listdir(summed_dir_path) if isfile(join(summed_dir_path, f))]
 
     for f in only_files:
+        # define filename
         input_file_name = summed_dir_path + f
-        # open workbook and worksheet
-        wb = load_workbook(input_file_name)
-        global ws
-        ws = wb.get_active_sheet()
+
+        #
+        global df
+        df = pd.read_excel(input_file_name, index_col=0)
 
         # load data
         load_all_data(data_dir_path)
@@ -307,8 +310,8 @@ def main():
         # append data
         append_all_data()
 
-        # save workbook
-        wb.save(input_file_name)
+        # save the workbook as a csv file
+        df.to_csv(summed_dir_path + os.sep + 'csv' + os.sep + f.split('.')[0] + '.csv', index=False)
 
 
 if __name__ == "__main__":

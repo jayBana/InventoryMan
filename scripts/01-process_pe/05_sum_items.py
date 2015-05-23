@@ -47,7 +47,7 @@ def main():
     # sum up products for each day
     for k, v in dict_to_sum.items():
         # sum up product if in set of product keys per item
-        result = table.loc[table['Stock Code'].isin(v)][['Date', 'Unit Sales']]
+        result = table.loc[table['Stock Code'].isin(v)].groupby(['Date'], as_index=False).sum()[['Date', 'Unit Sales']]
         # create the name for saving the file
         prod_name = 'prod_' + k.lower().replace(' ', '_')
         # define the path for file to be saved
