@@ -2,7 +2,42 @@ __author__ = 'janosbana'
 
 import json
 import os
+import requests
 from datetime import timedelta, date
+
+
+# get weather data for the next 7 days from worldweatheronline.com api
+def get_weather_data():
+    # define parameters for api call
+    location = 'NG1'
+    date = 'today'
+    days = '7'
+    time_interval = '24'
+    format = 'json'
+    api_key = 'ec3b4eb6ae0fd0c07912a156c046d'
+    url = 'http://api.worldweatheronline.com/premium/v1/weather.ashx?' + 'q=' + location + '&date=' + date + \
+          '&num_of_days=' + days + '&tp=' + time_interval + '&format=' + format + '&key=' + api_key
+
+    # make the call and format as json
+    response = requests.request('GET', url).json()
+
+    # create dictionary for extracting only info that we need
+    weather_data = {}
+
+    # each day in response
+    for entry in response['data']['weather']:
+        # get the information that we are interested at
+        date_string = entry['date']
+        cloud_cover = entry['hourly'][0]['cloudcover']
+        temp = entry['hourly'][0]['FeelsLikeC']
+        precip = entry['hourly'][0]['precipMM']
+        wind_speed = entry['hourly'][0]['windspeedKmph']
+
+        # add the info as a list to dict with key of the day's date
+        weather_data[date_string] = [float(cloud_cover), float(temp), float(precip), float(wind_speed)]
+
+    return weather_data
+
 
 # load uni key dates
 def load_uni_key_dates(file_path):
@@ -113,6 +148,11 @@ def main():
     city_school_days = load_school_days(city_days_path)
     county_school_days = load_school_days(county_days_path)
     uni_key_dates = load_uni_key_dates(uni_key_dates_path)
+
+    today = date.today()
+
+    # get data from apis
+    weather_data = get_weather_data()
 
 
 if __name__ == '__main__':
