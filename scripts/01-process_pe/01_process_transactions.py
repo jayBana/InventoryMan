@@ -7,7 +7,7 @@ sections in each file and adds them to the appropriate sheet
 
 import os
 import xlrd
-from os.path import isfile, join, basename
+from os.path import isfile, join
 from posix import listdir
 from openpyxl.workbook import Workbook
 
