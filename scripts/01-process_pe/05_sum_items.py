@@ -9,7 +9,8 @@ import os.path
 import csv
 import json
 import pandas as pd
-from pandas import ExcelWriter
+from pandas import ExcelWriter, merge
+
 
 def main():
     # first argument the path for file to be processed
@@ -44,17 +45,19 @@ def main():
         # save set of product keys for each item
         dict_to_sum[line[0]] = ids
 
+    # create a final table
+    final_table = pd.DataFrame(table['Date']).groupby(['Date'], as_index=False).sum()
+
     # sum up products for each day
     for k, v in dict_to_sum.items():
         # sum up product if in set of product keys per item
         result = table.loc[table['Stock Code'].isin(v)].groupby(['Date'], as_index=False).sum()[['Date', 'Unit Sales']]
         # create the name for saving the file
         prod_name = 'prod_' + k.lower().replace(' ', '_')
-        # define the path for file to be saved
-        fp = dir_path + 'daily_summed_usage' + os.sep + prod_name + '.xlsx'
-        # save summed items as xlsx file
-        with ExcelWriter(fp) as writer:
-            result.to_excel(writer, sheet_name='Sheet', index=False)
+        # rename the summed column
+        result.rename(columns={result.columns[1]: prod_name}, inplace=True)
+        # merge results together
+        final_table = merge(final_table, result, how='outer', on='Date')
 
     # get the list of ingredients
     ingredients = []
@@ -66,11 +69,18 @@ def main():
     for i in ingredients:
         # sum daily ingredient usage
         result = table[['Date', i]].groupby(['Date'], as_index=False).sum()
-        # define where to save the file
-        fp = dir_path + 'daily_summed_usage' + os.sep + i.split(' ')[0] + '.xlsx'
-        # save it as xlsx file
-        with ExcelWriter(fp) as writer:
-            result.to_excel(writer, sheet_name='Sheet', index=False)
-    
+        # merge results together
+        final_table = merge(final_table, result, how='outer', on='Date')
+
+    # fill NaN values
+    final_table = final_table.fillna(0)
+
+    # define where to save the file
+    file_path = dir_path + 'daily_summed_usage' + os.sep + 'merged_table.csv'
+    # save it as a csv file
+    with open(file_path, mode='w') as fp:
+        final_table.to_csv(fp, index=False)
+
+
 if __name__ == '__main__':
     main()

@@ -213,11 +213,9 @@ def load_all_data(data_dir_path):
 
 
 # appends all data to each row in each file
-def append_all_data():
-    global df, date_string
-    # create index and headers
+def append_all_data(index):
+    # create headers
     # index is a range of dates starting from the first entry of the workbook to the last one
-    index = pd.date_range(df.index[0], df.index[-1])
     columns = ['Daily Sales', 'Weekly Sales', 'Day', 'Week Number', 'Year Day', 'Weekend',
                'Bank Holiday', 'City School Holidays', 'County School Holidays', 'UoN Welcome Week', 'UoN Term',
                'UoN Graduation', 'UoN Exam', 'Trent Welcome Week', 'Trent Term', 'Trent Graduation', 'Trent Exam',
@@ -227,21 +225,19 @@ def append_all_data():
         columns.append(events[i][0])
 
     # create empty data frame
-    df_ = pd.DataFrame(index=index, columns=columns)
-    # join this empty data frame to existing one (our excel workbook)
-    df = df.join(df_)
+    df = pd.DataFrame(index=index, columns=columns)
 
     # do this for each row
     for i in range(len(df.index)):
         # get date for row
-        d_date = df.index[i]
-        # create ISO 8601
-        date_string = d_date.strftime("%Y-%m-%d")
+        date_string = df.index[i]
+        # create date object from ISO 8601 date string
+        d_date = datetime.strptime(date_string, "%Y-%m-%d").date()
         day_no = d_date.isoweekday()
         y_day = d_date.timetuple().tm_yday
         weekend = 1 if (day_no == 6 or day_no == 7) else 0
         # get sales based on year and week number
-        week_no = d_date.isocalendar()[1]
+        week_no = str(d_date.isocalendar()[1])
         week_sales_key = str(d_date.isocalendar()[0]) + '-' + week_no
 
         # create sales daily and weekly sales
@@ -249,41 +245,37 @@ def append_all_data():
         w_sales = weekly_sales[week_sales_key]
 
         # sales
-        df.ix[d_date, 1] = d_sales
-        df.ix[d_date, 2] = w_sales
+        df.ix[date_string, 0] = d_sales
+        df.ix[date_string, 1] = w_sales
         # date info
-        df.ix[d_date, 3] = day_no
-        df.ix[d_date, 4] = week_no
-        df.ix[d_date, 5] = y_day
-        df.ix[d_date, 6] = weekend
+        df.ix[date_string, 2] = day_no
+        df.ix[date_string, 3] = week_no
+        df.ix[date_string, 4] = y_day
+        df.ix[date_string, 5] = weekend
         # holidays
-        df.ix[d_date, 7] = 1 if date_string in bank_holidays else 0
-        df.ix[d_date, 8] = 0 if date_string in city_days else 1
-        df.ix[d_date, 9] = 0 if date_string in county_days else 1
+        df.ix[date_string, 6] = 1 if date_string in bank_holidays else 0
+        df.ix[date_string, 7] = 0 if date_string in city_days else 1
+        df.ix[date_string, 8] = 0 if date_string in county_days else 1
         # Uni of Nott key dates
-        df.ix[d_date, 10] = 1 if date_string in uon_sets[0] else 0
-        df.ix[d_date, 11] = 1 if date_string in uon_sets[1] else 0
-        df.ix[d_date, 12] = 1 if date_string in uon_sets[2] else 0
-        df.ix[d_date, 13] = 1 if date_string in uon_sets[3] else 0
+        df.ix[date_string, 9] = 1 if date_string in uon_sets[0] else 0
+        df.ix[date_string, 10] = 1 if date_string in uon_sets[1] else 0
+        df.ix[date_string, 11] = 1 if date_string in uon_sets[2] else 0
+        df.ix[date_string, 12] = 1 if date_string in uon_sets[3] else 0
         # Trent uni key dates
-        df.ix[d_date, 14] = 1 if date_string in trent_sets[0] else 0
-        df.ix[d_date, 15] = 1 if date_string in trent_sets[1] else 0
-        df.ix[d_date, 16] = 1 if date_string in trent_sets[2] else 0
-        df.ix[d_date, 17] = 1 if date_string in trent_sets[3] else 0
+        df.ix[date_string, 13] = 1 if date_string in trent_sets[0] else 0
+        df.ix[date_string, 14] = 1 if date_string in trent_sets[1] else 0
+        df.ix[date_string, 15] = 1 if date_string in trent_sets[2] else 0
+        df.ix[date_string, 16] = 1 if date_string in trent_sets[3] else 0
         # Weather data
-        df.ix[d_date, 18] = weather_data[date_string][0]
-        df.ix[d_date, 19] = weather_data[date_string][1]
-        df.ix[d_date, 20] = weather_data[date_string][2]
-        df.ix[d_date, 21] = weather_data[date_string][3]
+        df.ix[date_string, 17] = weather_data[date_string][0]
+        df.ix[date_string, 18] = weather_data[date_string][1]
+        df.ix[date_string, 19] = weather_data[date_string][2]
+        df.ix[date_string, 20] = weather_data[date_string][3]
         # Events data
         for c in range(len(events)):
-            df.ix[d_date, 22 + c] = 1 if date_string in events[c][1] else 0
+            df.ix[date_string, 21 + c] = 1 if date_string in events[c][1] else 0
 
-    # rename and move units used to the end
-    df.rename(columns={df.columns[0]: 'Target'}, inplace=True)
-    cols = df.columns.tolist()
-    cols = cols[1:] + cols[:1]
-    df = df[cols]
+    return df
 
 
 def main():
@@ -293,25 +285,25 @@ def main():
     # path for file to be processed
     summed_dir_path = data_dir_path + 'peData' + os.sep + 'daily_summed_usage' + os.sep
 
-    # get the list of files in the directory
-    only_files = [f for f in listdir(summed_dir_path) if isfile(join(summed_dir_path, f))]
+    # define input filename
+    input_file_name = summed_dir_path + 'merged_table.csv'
 
-    for f in only_files:
-        # define filename
-        input_file_name = summed_dir_path + f
+    # read in table
+    final_table = pd.read_csv(input_file_name, index_col=0)
+    # create date series to be used as index
+    index = pd.Series(final_table.index.values)
 
-        #
-        global df
-        df = pd.read_excel(input_file_name, index_col=0)
+    # load data
+    load_all_data(data_dir_path)
 
-        # load data
-        load_all_data(data_dir_path)
+    # append data
+    df = append_all_data(index)
 
-        # append data
-        append_all_data()
+    # join tables together
+    final_table = df.join(final_table)
 
-        # save the workbook as a csv file
-        df.to_csv(summed_dir_path + os.sep + 'csv' + os.sep + f.split('.')[0] + '.csv', index=False)
+    # save the workbook as a csv file
+    final_table.to_csv(summed_dir_path + 'appended_table.csv', index=False)
 
 
 if __name__ == "__main__":
