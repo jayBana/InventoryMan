@@ -1,14 +1,18 @@
 __author__ = 'janosbana'
+'''
+this script is responsible for collecting all the features data for the next 7 days from today and for each day
+create a list of features that can be used by our trained models
+'''
 
 import json
 import os
 import requests
+import calendar
 from datetime import datetime, timedelta, date
 from xml.etree import ElementTree as ET
 
 # get events data for next 7 days from eventful api
 def get_eventful_data(venue_names_path, today):
-
     # save our api key
     app_key = '2J7PsVHMXzdwZHfZ'
 
@@ -75,6 +79,7 @@ def get_eventful_data(venue_names_path, today):
         event_dates.append((venue_name, dates))
 
     return event_dates
+
 
 # get weather data for the next 7 days from worldweatheronline.com api
 def get_weather_data():
@@ -226,6 +231,77 @@ def main():
     # get data from apis
     weather_data = get_weather_data()
     events_data = get_eventful_data(venue_names_path, today)
+
+    # create empty list for values
+    data = []
+
+    # create dates from today for 7 days onwards
+    dates = []
+    for d in range(7):
+        data.append([])
+        new_date = today + timedelta(days=d)
+        dates.append(new_date)
+
+    # for each date append
+    for d in dates:
+        # factor the shift in weekdays each year
+        year_ago = 363 if calendar.isleap(today.year) else 364
+        prev_date = d - timedelta(days=year_ago)
+        cur_d = d.strftime("%Y-%m-%d")
+        prev_d = prev_date.strftime("%Y-%m-%d")
+        sales = daily_sales[prev_d]
+        if prev_d in bank_holidays and cur_d not in bank_holidays:
+            sales *= 0.8
+        elif prev_d not in bank_holidays and cur_d in bank_holidays:
+            sales *= 1.3
+        else:
+            sales *= 1.1
+
+        i = dates.index(d)
+        data[i].append(cur_d)
+        # append daily sales to array of values
+        data[i].append(int(sales))
+        # append weekday to array of values
+        weekday = d.weekday()
+        data[i].append(weekday)
+        # append week number
+        data[i].append(d.isocalendar()[1])
+        # append year day
+        data[i].append(d.timetuple().tm_yday)
+        # append weekend indicator
+        is_weekend = 1 if weekday == 5 or weekday == 6 else 0
+        data[i].append(is_weekend)
+        # append bank holiday
+        is_bank_holiday = 1 if cur_d in bank_holidays else 0
+        data[i].append(is_bank_holiday)
+        # append school holidays
+        is_city_holiday = 0 if cur_d in city_school_days else 1
+        is_county_holiday = 0 if cur_d in county_school_days else 1
+        data[i].append(is_city_holiday)
+        data[i].append(is_county_holiday)
+        # append uni key dates
+        uni_dates = []
+        for j in range(len(uni_key_dates)):
+            for k in range(len(uni_key_dates[j])):
+                is_date = 1 if cur_d in uni_key_dates[j][k] else 0
+                uni_dates.append(is_date)
+        data[i] += uni_dates
+        # append weather data
+        data[i] += weather_data[cur_d]
+        # append events
+        event_dates = []
+        for e in events_data:
+            if e[1] is None:
+                event_dates.append(0)
+                continue
+
+            is_date = 1 if cur_d in e[1] else 0
+            event_dates.append(is_date)
+        data[i] += event_dates
+        # append target value
+        data[i].append(0)
+
+    return data
 
 
 if __name__ == '__main__':
