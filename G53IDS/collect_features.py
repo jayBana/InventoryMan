@@ -3,8 +3,78 @@ __author__ = 'janosbana'
 import json
 import os
 import requests
-from datetime import timedelta, date
+from datetime import datetime, timedelta, date
+from xml.etree import ElementTree as ET
 
+# get events data for next 7 days from eventful api
+def get_eventful_data(venue_names_path, today):
+
+    # save our api key
+    app_key = '2J7PsVHMXzdwZHfZ'
+
+    # format dates to required scheme for api call
+    from_date = today.strftime("%Y%m%d") + "00"
+    to_date = (today + timedelta(days=7)).strftime("%Y%m%d") + "00"
+
+    # open file that contains venue ids
+    with open(venue_names_path, encoding='utf-8') as data_file:
+        venues = json.load(data_file)['venues']
+
+    # create empty list for dates
+    event_dates = []
+
+    # for each venue in our list
+    for venue in venues:
+        # get name and location id
+        venue_name, location = venue.split(':')
+
+        # prepare url and make api call
+        url = 'http://api.eventful.com/rest/events/search?app_key=' + app_key + '&date=' + from_date + '-' + to_date + '&location=' + location
+        response = requests.request('GET', url)
+
+        # parse XML response
+        root = ET.fromstring(response.content)
+        events = root.find('events')
+
+        # set of dates for this venue
+        dates = set()
+
+        # if there are no events for this venue, then just add a None object to out list and continue to next iteration
+        if not events:
+            event_dates.append((venue_name, None))
+            continue
+
+        # for each event
+        for event in events:
+            # get start end end dates
+            start_date = event.find("start_time").text
+            end_date = event.find("stop_time").text
+
+            # if there is no end date then we know that this event is on one day only
+            if end_date is None:
+                dates.add(start_date.split(" ")[0])
+                continue
+
+            # create date objects
+            s_date = datetime.strptime(start_date.split(" ")[0], "%Y-%m-%d").date()
+            e_date = datetime.strptime(end_date.split(" ")[0], "%Y-%m-%d").date()
+
+            # get number of days between two dates
+            delta = e_date - s_date
+
+            # for each day from start to end date
+            for d in range(delta.days + 1):
+                # convert date to ISO 8601 format
+                add_date = (s_date + timedelta(days=d)).strftime("%Y-%m-%d")
+
+                # add date to set if not already in set
+                if add_date not in dates:
+                    dates.add(add_date)
+
+        # append set to list of dates with the venue's name
+        event_dates.append((venue_name, dates))
+
+    return event_dates
 
 # get weather data for the next 7 days from worldweatheronline.com api
 def get_weather_data():
@@ -138,6 +208,8 @@ def main():
     city_days_path = data_dir_path + 'nottcity_SchoolHolidays.json'
     county_days_path = data_dir_path + 'nottshire_SchoolHolidays.json'
     uni_key_dates_path = data_dir_path + 'uni_key-dates.json'
+    venue_names_path = data_dir_path + 'eventful_venues.json'
+    events_data = get_eventful_data(venue_names_path, today)
 
     # load daily sales json
     with open(daily_sales_path, encoding='utf-8') as data_file:
@@ -153,6 +225,7 @@ def main():
 
     # get data from apis
     weather_data = get_weather_data()
+    events_data = get_eventful_data(venue_names_path, today)
 
 
 if __name__ == '__main__':
