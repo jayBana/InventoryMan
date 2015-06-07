@@ -115,9 +115,8 @@ def load_all_data(data_dir_path):
         data = json.load(data_file)
     bank_holidays = set()
     for entry in data:
-        # only the ones that are actual days offs
-        if entry['bunting']:
-            bank_holidays.add(entry['date'])
+        # add the dates to the set
+        bank_holidays.add(entry['date'])
 
     ### SCHOOL HOLIDAYS ###
     global city_days
