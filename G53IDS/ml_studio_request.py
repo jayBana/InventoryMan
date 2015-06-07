@@ -9,12 +9,14 @@ Note: the code was taken from Azure's ML Studio web service information page and
 
 import json
 import requests
+from datetime import date, timedelta
 from collect_features import main as collect_features
 
-
 def main():
+    start_date = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
+    days = 14
     # get the features to be passed in with api call
-    values = collect_features()
+    values = collect_features(start_date, days)
 
     # prepare API call body
     data = {
@@ -37,8 +39,8 @@ def main():
 
     # prepare parameters for API call
     body = str.encode(json.dumps(data))
-    url = 'https://ussouthcentral.services.azureml.net/workspaces/2cef58aae0904039bd3bc470718fb9d9/services/7a76e2bb985a4d5ba3eadee43c76b8eb/execute?api-version=2.0&details=true'
-    api_key = 'UGlKgykV4BSYFf3YH1+WK0W4Jtj2iZQWTWf2x2mAmJsZWwjSsOKn8vOG+rVGrTEojhD0PH5f2MXiL+6duRSMuw=='
+    url = 'https://ussouthcentral.services.azureml.net/workspaces/2cef58aae0904039bd3bc470718fb9d9/services/98d96dd51860427ebec407b6871ec3c5/execute?api-version=2.0&details=true'
+    api_key = 'IOgTLGR96fE2bHHw9+k7M6iRpsJTwROAFVTdrEEIHOZjAiLmCGZgoh073Z7ly9w5F7lnitFke++gJL8PbZzt9Q=='
     headers = {'Content-Type': 'application/json', 'Authorization': ('Bearer ' + api_key)}
 
     # make the call
@@ -46,21 +48,20 @@ def main():
         response = requests.request('POST', url, data=body, headers=headers).json()
 
         # process the response
-        results = {}
+        results = []
         for item in response['Results']['output1']['value']['Values']:
-            if item[1] not in results:
-                results[item[1]] = {}
+            entry = (item[1], item[0], round(float(item[2]), 2))
+            results.append(entry)
 
-            # save each item in dictionary with date as key, each value is product/ingredient key: consumption value
-            results[item[1]][item[0]] = item[2]
-
-        return results
+        results.sort()
+        return results, start_date
 
     # handle errors
     except requests.HTTPError as error:
         print(("The request failed with status code: " + str(error.code)))
         # Print the headers - they include the request ID and the timestamp, which are useful for debugging the failure
         print((error.info()))
+
 
 if __name__ == '__main__':
     main()
