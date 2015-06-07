@@ -12,13 +12,13 @@ from datetime import datetime, timedelta, date
 from xml.etree import ElementTree as ET
 
 # get events data for next 7 days from eventful api
-def get_eventful_data(venue_names_path, today):
+def get_eventful_data(venue_names_path, s_date):
     # save our api key
     app_key = '2J7PsVHMXzdwZHfZ'
 
     # format dates to required scheme for api call
-    from_date = today.strftime("%Y%m%d") + "00"
-    to_date = (today + timedelta(days=7)).strftime("%Y%m%d") + "00"
+    from_date = s_date.strftime("%Y%m%d") + "00"
+    to_date = (s_date + timedelta(days=7)).strftime("%Y%m%d") + "00"
 
     # open file that contains venue ids
     with open(venue_names_path, encoding='utf-8') as data_file:
@@ -85,13 +85,12 @@ def get_eventful_data(venue_names_path, today):
 def get_weather_data():
     # define parameters for api call
     location = 'NG1'
-    date = 'today'
-    days = '7'
     time_interval = '24'
+    date = 'today'
     format = 'json'
-    api_key = 'ec3b4eb6ae0fd0c07912a156c046d'
+    api_key = 'e0d7bc79d0cd8d25a73fff5f3fbb8'
     url = 'http://api.worldweatheronline.com/premium/v1/weather.ashx?' + 'q=' + location + '&date=' + date + \
-          '&num_of_days=' + days + '&tp=' + time_interval + '&format=' + format + '&key=' + api_key
+          '&tp=' + time_interval + '&format=' + format + '&key=' + api_key
 
     # make the call and format as json
     response = requests.request('GET', url).json()
@@ -205,7 +204,7 @@ def load_bank_holidays(file_path):
     return bank_holidays
 
 
-def main():
+def main(start_date, days):
     # paths for resources
     data_dir_path = 'data' + os.sep
     daily_sales_path = data_dir_path + 'daily_sale_figures.json'
@@ -214,7 +213,6 @@ def main():
     county_days_path = data_dir_path + 'nottshire_SchoolHolidays.json'
     uni_key_dates_path = data_dir_path + 'uni_key-dates.json'
     venue_names_path = data_dir_path + 'eventful_venues.json'
-    events_data = get_eventful_data(venue_names_path, today)
 
     # load daily sales json
     with open(daily_sales_path, encoding='utf-8') as data_file:
@@ -226,26 +224,26 @@ def main():
     county_school_days = load_school_days(county_days_path)
     uni_key_dates = load_uni_key_dates(uni_key_dates_path)
 
-    today = date.today()
+    s_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
     # get data from apis
     weather_data = get_weather_data()
-    events_data = get_eventful_data(venue_names_path, today)
+    events_data = get_eventful_data(venue_names_path, s_date)
 
     # create empty list for values
     data = []
 
     # create dates from today for 7 days onwards
     dates = []
-    for d in range(7):
+    for d in range(days):
         data.append([])
-        new_date = today + timedelta(days=d)
+        new_date = s_date + timedelta(days=d)
         dates.append(new_date)
 
     # for each date append
     for d in dates:
         # factor the shift in weekdays each year
-        year_ago = 363 if calendar.isleap(today.year) else 364
+        year_ago = 363 if calendar.isleap(s_date.year) else 364
         prev_date = d - timedelta(days=year_ago)
         cur_d = d.strftime("%Y-%m-%d")
         prev_d = prev_date.strftime("%Y-%m-%d")
