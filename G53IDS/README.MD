@@ -1,0 +1,1 @@
+This project is loosely based on the content from the "Real Python Vol. 2" book by Micheal Herman.
