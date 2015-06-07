@@ -12,7 +12,9 @@ import requests
 from datetime import date, timedelta
 from collect_features import main as collect_features
 
+
 def main():
+    # get the features for 14 days from tomorrow
     start_date = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
     days = 14
     # get the features to be passed in with api call
@@ -50,10 +52,12 @@ def main():
         # process the response
         results = []
         for item in response['Results']['output1']['value']['Values']:
+            # create a list of tuples (date, item_name, predicted_quantity)
             entry = (item[1], item[0], round(float(item[2]), 2))
             results.append(entry)
-
+        # sort list of tuples
         results.sort()
+
         return results, start_date
 
     # handle errors
