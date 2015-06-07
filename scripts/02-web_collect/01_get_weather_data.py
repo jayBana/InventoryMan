@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-script that collects weather data from
+script that collects weather data from http://www.worldweatheronline.com/
 '''
 
 import urllib.request
