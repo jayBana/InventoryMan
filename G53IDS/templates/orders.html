@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+{% block content %}
+    <h1>Welcome to Inventory Manager.</h1>
+    <!-- Summed orders table -->
+    <div class="items">
+        {% if one_day %}
+            <h2>Summed Orders: {{ start_date }}</h2>
+        {% else %}
+            <h2>Summed Orders: {{ start_date }} - {{ end_date }}</h2>
+        {% endif %}
+        <div class="datagrid">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th width="400px"><strong>Item Name</strong></th>
+                    <th width="125px"><strong>Predicted Total</strong></th>
+                </tr>
+                </thead>
+                {% for sum in summed %}
+                    <tr>
+                        <td width="400px">{{ sum.name }}</td>
+                        <td width="125px">{{ sum.total }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <br>
+        <br>
+    </div>
+
+    <!-- Individual orders table -->
+    <div class="items">
+        <h2>Order List</h2>
+
+        <div class="datagrid">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th width="100px"><strong>Date</strong></th>
+                    <th width="300px"><strong>Item Name</strong></th>
+                    <th width="125px"><strong>Predicted</strong></th>
+                </tr>
+                </thead>
+                {% for order in order_list %}
+                    <tr>
+                        <td width="100px">{{ order.date }}</td>
+                        <td width="300px">{{ order.name }}</td>
+                        <td width="125px">{{ order.predicted }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <br>
+        <br>
+    </div>
+{% endblock %}

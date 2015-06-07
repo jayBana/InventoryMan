@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import Flask, flash, session, redirect, url_for, request, render_template
+from get_results import get_predictions_all, get_predictions_subset
 
 # config
 app = Flask(__name__)
@@ -48,9 +49,31 @@ def login():
         else:
             session['logged_in'] = True
             flash('Welcome')
+            # get the predictions upon login
+            get_predictions_all()
             return redirect(my_url_for('orders'))
     return render_template('login.html')
 
 
-if __name__ == '__main__':
-    app.run()
+@app.route('/orders/', methods=['GET', 'POST'])
+@login_required
+def orders():
+    if request.method == 'POST':
+        start_date = request.form['start']
+        end_date = request.form['end']
+        results, summed = get_predictions_subset(start_date, end_date)
+    else:
+        results, summed, start_date, end_date = get_predictions_subset()
+
+    order_list = [dict(date=entry[0], name=entry[1], predicted=entry[2]) for entry in results]
+    summed = [dict(name=k, total=v) for k, v in summed.items()]
+    one_day = True if (end_date == start_date) else False
+
+    return render_template(
+        'orders.html',
+        one_day=one_day,
+        start_date=start_date,
+        end_date=end_date,
+        order_list=order_list,
+        summed=summed
+    )
