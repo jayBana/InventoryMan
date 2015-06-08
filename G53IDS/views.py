@@ -16,8 +16,14 @@ def my_url_for(*args, **kwargs):
         if app.config['PORT'] is not None:  # If we have a port, we should do something
             url = url.replace('://localhost/',
                               '://localhost:%d/' % (app.config['PORT']))  # Oh yeah, add the port to the URL
+        print(url)
         return url
 
+def format_url(url):
+    return '//localhost:{}'.format(app.config['PORT']) + url
+
+app.jinja_env.globals.update(my_url_for=my_url_for)
+app.jinja_env.globals.update(format_url=format_url)
 
 def login_required(test):
     @wraps(test)
@@ -27,16 +33,15 @@ def login_required(test):
         else:
             flash('You need to login first.')
             return redirect(my_url_for('login'))
-
     return wrap
 
 
 # route handlers
-@app.route('/logout/')
+@app.route('/logout/', methods=['GET'])
 def lougout():
     session.pop('logged_in', None)
-    print(session)
     flash('Goodbye!')
+    print('hello')
     return redirect(my_url_for('login'))
 
 
