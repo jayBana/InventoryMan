@@ -3,13 +3,11 @@
 
     <h1>Welcome to Inventory Manager!</h1>
     <h3>Please login to access your order sheet.</h3>
-
     <form class="form-signin" method="post" action="/">
-        <span>Username: <input type="text" name="username" value="{{ request.form.username }}"</span>
-        <span>Password: <input type="password" name="password" value="{{ request.form.password }}"</span>
-        <input class="btn btn-sm btn-success" type="submit" value="Login">
+        <span>Username: <input type="text" name="username" value="{{ request.form.username }}"></span>
+        <span>Password: <input type="password" name="password" value="{{ request.form.password }}"></span>
+        <input class="btn btn-sm btn-success" id="login-btn" type="submit" value="Login" >
     </form>
-
     <p><em>Use 'admin' for the username and password.</em></p>
-
+    <div id="loading" style="display:none"></div>
 {% endblock %}
