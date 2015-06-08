@@ -1,6 +1,28 @@
 {% extends "_base.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker3.min.css') }}">
+{% endblock %}
 {% block content %}
     <h1>Welcome to Inventory Manager.</h1>
+    <!-- Date picker -->
+    <div class="add-date">
+        <h3>Choose a period:</h3>
+
+        <form class="form-inline" action="/orders/" method="post">
+            <div class="input-daterange" id="datepicker">
+                <div class="form-group">
+                    <label for="start">From:</label>
+                    <input type="text" class="input-sm form-control" name="start" id="start" required/>
+                </div>
+                <div class="form-group">
+                    <label for="end">to:</label>
+                    <input type="text" class="input-sm form-control" name="end" id="end"/>
+                </div>
+                <button type="submit" class="btn btn-info btn-sm">Submit</button>
+            </div>
+        </form>
+    </div>
     <!-- Summed orders table -->
     <div class="items">
         {% if one_day %}
@@ -53,4 +75,10 @@
         <br>
         <br>
     </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='locales/bootstrap-datepicker.en-GB.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/orders.js') }}"></script>
 {% endblock %}
