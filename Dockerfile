@@ -13,6 +13,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install virtualenv virtualenvwrapper
 RUN mkdir -p /home/www/G53IDS && cd /home/www/G53IDS
 COPY G53IDS /home/www/G53IDS
+RUN chmod 777 -R /home/www/G53IDS/static/
 RUN mkdir -p ~/.virtualenvs
 ENV WORKON_HOME=~/.virtualenvs \
     VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3 \
