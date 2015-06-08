@@ -16,4 +16,4 @@ THREADED = False
 DEBUG = True
 
 # port needs to be defined if it want it to run in vagrant
-PORT = 5000
+PORT = 8080
