@@ -13,7 +13,7 @@ app = Flask(__name__, template_folder=tmpl_dir)
 app.config.from_object('_config')
 Triangle(app)
 
-# helper functions
+### helper functions ###
 
 # source: https://github.com/mitsuhiko/flask/issues/824 by Chris Newhouse (newhouse)
 def my_url_for(*args, **kwargs):
@@ -25,6 +25,30 @@ def my_url_for(*args, **kwargs):
                               '://localhost:%d/' % (app.config['PORT']))  # Oh yeah, add the port to the URL
         return url
 
+def format_url(url):
+    return '//localhost:{}/'.format(app.config['PORT']) + url + '/'
+
+# add helper functions to jinja2 templating engine
+app.jinja_env.globals.update(my_url_for=my_url_for)
+app.jinja_env.globals.update(format_url=format_url)
+
+def login_required(test):
+    @wraps(test)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return test(*args, **kwargs)
+        else:
+            flash('You need to login first.')
+            return redirect(my_url_for('login'))
+
+    return wrap
+
+# route handlers
+@app.route('/logout/', methods=['GET'])
+def lougout():
+    session.pop('logged_in', None)
+    flash('Goodbye!')
+    return redirect(my_url_for('login'))
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
