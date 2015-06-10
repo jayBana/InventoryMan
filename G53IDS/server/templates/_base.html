@@ -30,6 +30,9 @@
                     <li><a href="{{ format_url('logout') }}">Sign Out</a></li>
                 {% endif %}
             </ul>
+            {% if session.logged_in %}
+                    <p class="navbar-text navbar-right">Today's date: {{ today }}</p>
+            {% endif %}
         </div>
     </div>
 </div>

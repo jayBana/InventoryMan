@@ -2,6 +2,7 @@
 import os
 import builtins
 import json
+from datetime import date
 
 builtins.unicode = str
 
@@ -64,6 +65,7 @@ def login():
         else:
             session['logged_in'] = True
             flash('Welcome')
+
             # get the predictions upon login
             return redirect(my_url_for('index'))
     return render_template('login.html')
@@ -71,7 +73,8 @@ def login():
 
 @app.route('/index/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    today = date.today().strftime("%Y-%m-%d")
+    return render_template('index.html', today=today)
 
 
 @app.route('/data', methods=['GET'])
