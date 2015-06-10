@@ -1,6 +1,7 @@
 # needed import for flask-triangle to work
 import os
 import builtins
+import json
 
 builtins.unicode = str
 
@@ -25,12 +26,14 @@ def my_url_for(*args, **kwargs):
                               '://localhost:%d/' % (app.config['PORT']))  # Oh yeah, add the port to the URL
         return url
 
+
 def format_url(url):
     return '//localhost:{}/'.format(app.config['PORT']) + url + '/'
 
 # add helper functions to jinja2 templating engine
 app.jinja_env.globals.update(my_url_for=my_url_for)
 app.jinja_env.globals.update(format_url=format_url)
+
 
 def login_required(test):
     @wraps(test)
@@ -43,12 +46,14 @@ def login_required(test):
 
     return wrap
 
+
 # route handlers
 @app.route('/logout/', methods=['GET'])
 def lougout():
     session.pop('logged_in', None)
     flash('Goodbye!')
     return redirect(my_url_for('login'))
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -60,22 +65,22 @@ def login():
             session['logged_in'] = True
             flash('Welcome')
             # get the predictions upon login
-            return redirect(my_url_for('orders'))
+            return redirect(my_url_for('index'))
     return render_template('login.html')
 
 
-@app.route('/orders')
-def orders():
-    data = {
-        "2015-06-01": {
-            "dough": 16,
-            "cheese": 15,
-            "pepperoni": 17
-        },
-        "2015-06-02": {
-            "dough": 21,
-            "cheese": 22,
-            "pepperoni": 23
-        }
-    }
-    return jsonify(data)
+@app.route('/index/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+
+@app.route('/data', methods=['GET'])
+def results():
+    # delete this later on
+    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    with open(os.path.join(location,'results.json'), 'r', encoding='utf-8') as fp:
+        data = fp.read()
+    data = json.loads(data)
+    # end delete
+
+    return jsonify(orders=data)

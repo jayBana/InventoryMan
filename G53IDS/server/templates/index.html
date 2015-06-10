@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+{% block content %}
+   <div ng-view="" id="ng-view"></div>
+{% endblock %}
+{% block scripts %}
+    <!-- Libraries -->
+    <script src="{{ url_for('static', filename='lib/angular.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/ui-bootstrap-tpls-0.13.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/angular-route.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/angular-animate.min.js') }}"></script>
+    <!-- Own js -->
+    <script src="{{ url_for('static', filename='js/angular/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/angular/data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/angular/directives.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/angular/ordersListCtrl.js') }}"></script>
+    {{ super() }}
+{% endblock %}

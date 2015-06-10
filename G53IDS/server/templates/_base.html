@@ -19,7 +19,7 @@
                 <span class="icon-bar"></span>
             </button>
             {% if session.logged_in %}
-                <a class="navbar-brand" href="{{ my_url_for('orders') }}">InventoryMan</a>
+                <a class="navbar-brand" href="{{ my_url_for('index') }}">InventoryMan</a>
             {% else %}
                 <div class="navbar-brand">InventoryMan</div>
             {% endif %}
@@ -35,7 +35,7 @@
 </div>
 <!--- Main container--->
 <div class="container">
-    <div class="content">
+    <div class="content" data-ng-app="myApp">
         {% for message in get_flashed_messages() %}
             <div class="alert alert-info">{{ message }}</div>
         {% endfor %}
@@ -55,9 +55,9 @@
 </div>
 </body>
 {% block scripts %}
-    <script src= {{ url_for('static', filename='lib/jquery-2.1.4.min.js') }}></script>
-    <script src= {{ url_for('static', filename='lib/jquery-ui.min.js') }}></script>
-    <script src= {{ url_for('static', filename='lib/bootstrap.min.js') }}></script>
+    <script src="{{ url_for('static', filename='lib/jquery-2.1.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>
 {% endblock %}
 </html>
