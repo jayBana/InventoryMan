@@ -4,3 +4,9 @@ window.setTimeout(function () {
         $(this).remove();
     });
 }, 3000);
+
+function checkTextField(field) {
+    if (field.value == '') {
+        alert("Field is empty");
+    }
+}

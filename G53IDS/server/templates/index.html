@@ -1,17 +1,28 @@
 {% extends "_base.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker3.min.css') }}">
+{% endblock %}
 {% block content %}
-   <div ng-view="" id="ng-view"></div>
+    <div ng-view="" id="ng-view"></div>
 {% endblock %}
 {% block scripts %}
-    <!-- Libraries -->
+    <!-- Angular Libraries -->
     <script src="{{ url_for('static', filename='lib/angular.min.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/ui-bootstrap-tpls-0.13.0.min.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/angular-route.min.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/angular-animate.min.js') }}"></script>
-    <!-- Own js -->
+    <!-- Own Angular -->
     <script src="{{ url_for('static', filename='js/angular/app.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/angular/data.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/angular/directives.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/angular/ordersListCtrl.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/angular/services/data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/angular/directives/directives.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/angular/controllers/ordersListCtrl.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/angular/filters/filters.js') }}"></script>
+    <!-- Own js and other libraries -->
     {{ super() }}
+    <script src="{{ url_for('static', filename='lib/moment.min.js') }}"></script>
+    <!-- Modules -->
+    <script src="{{ url_for('static', filename='js/mods/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mods/bootstrap-datepicker.en-GB.min.js') }}"></script>
+
 {% endblock %}
