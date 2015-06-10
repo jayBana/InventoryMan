@@ -5,8 +5,14 @@ window.setTimeout(function () {
     });
 }, 3000);
 
-function checkTextField(field) {
-    if (field.value == '') {
-        alert("Field is empty");
-    }
-}
+// loading overlay on login-btn click
+$('#login-btn').click(function () {
+    $.LoadingOverlay("show", {
+        color: "rgba(255, 255, 255, 0.8)",
+        image: "/static/img/loading.gif",
+        maxSize: "75px",
+        minSize: "25px",
+        resizeInterval: 0,
+        size: "25%"
+    });
+});
