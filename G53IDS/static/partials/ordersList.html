@@ -1,19 +1,35 @@
 <my-date-picker></my-date-picker>
 <br>
 <h4>Order list for {{ start_date }} - {{ end_date }}</h4>
+
 <div class="table-responsive">
     <div class="panel panel-primary">
         <div class="panel-heading">List of items:</div>
         <div class="panel-body">
-            <table class="table table-striped">
-                <tr>
-                    <th ng-repeat="c in columns">{{ c.text }}</th>
+            <table ng-table="tableParams" class="table table-striped">
+                <tbody ng-repeat="group in $groups" ng-controller="groupCtrl">
+                <tr class="ng-table-group">
+                    <td>
+                        <a href="" ng-click="group.$hideRows = !group.$hideRows">
+                            <span class="glyphicon"
+                                  ng-class="{ 'glyphicon-chevron-right': group.$hideRows, 'glyphicon-chevron-down': !group.$hideRows }"></span>
+                            <strong>{{ group.value }}</strong>
+                        </a>
+                    </td>
+                    <td class="text-center">
+                        <div><strong class="text-success">Total:</strong>&nbsp{{ calcSum(filteredItems) }}</div>
+                    </td>
                 </tr>
-                <tr ng-repeat="c in items|dateRange:start_date:end_date" >
-                    <td>{{ c.date }}</td>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.quantity }}</td>
+                <tr ng-hide="group.$hideRows"
+                    ng-repeat="item in (filteredItems = (group.data|dateRange:start_date:end_date))">
+                    <td data-title="'Date'" class="text-center">
+                        {{ item.date }}
+                    </td>
+                    <td data-title="'Quantity'" class="text-center">
+                        {{ item.quantity }}
+                    </td>
                 </tr>
+                </tbody>
             </table>
         </div>
     </div>

@@ -27,7 +27,6 @@ myApp.directive('myDatePicker', [function () {
             $('#start').on("change", function(e) {
                 $scope.$apply(function(){
                     $scope.start_date = $('#start').val();
-
                 });
             });
             $('#end').on("change", function(e) {

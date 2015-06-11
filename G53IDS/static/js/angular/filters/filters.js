@@ -17,7 +17,6 @@ myApp.filter('dateRange', function () {
                     result.push(item);
                 }
             });
-
             return result;
         }
     };

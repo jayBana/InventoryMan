@@ -2,6 +2,7 @@
 {% block head %}
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker3.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ng-table.min.css') }}">
 {% endblock %}
 {% block content %}
     <div ng-view="" id="ng-view"></div>
@@ -12,6 +13,8 @@
     <script src="{{ url_for('static', filename='lib/ui-bootstrap-tpls-0.13.0.min.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/angular-route.min.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/angular-animate.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/angular-resource.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/ng-table.min.js') }}"></script>
     <!-- Own Angular -->
     <script src="{{ url_for('static', filename='js/angular/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/angular/services/data.js') }}"></script>

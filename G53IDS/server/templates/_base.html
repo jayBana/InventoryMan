@@ -31,7 +31,7 @@
                 {% endif %}
             </ul>
             {% if session.logged_in %}
-                    <p class="navbar-text navbar-right">Today's date: {{ today }}</p>
+                <p class="navbar-text navbar-right">Today's date: {{ today }}</p>
             {% endif %}
         </div>
     </div>
@@ -54,6 +54,7 @@
 
         {% block content %}
         {% endblock %}
+
     </div>
 </div>
 </body>
