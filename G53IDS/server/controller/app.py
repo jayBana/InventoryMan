@@ -2,10 +2,11 @@
 import os
 import builtins
 import json
+from functools import wraps
 from datetime import date
 
 builtins.unicode = str
-
+from server.ml_helpers.ml_studio_request import main as ml_std_req
 from flask import Flask, jsonify, render_template, url_for, request, session, flash, redirect
 from flask.ext.triangle import Triangle
 
@@ -15,8 +16,12 @@ app = Flask(__name__, template_folder=tmpl_dir)
 app.config.from_object('_config')
 Triangle(app)
 
-### helper functions ###
+# globals
+global results_info
+global weather_info
+global events_info
 
+### helper functions ###
 # source: https://github.com/mitsuhiko/flask/issues/824 by Chris Newhouse (newhouse)
 def my_url_for(*args, **kwargs):
     with app.test_request_context():
@@ -34,6 +39,13 @@ def format_url(url):
 # add helper functions to jinja2 templating engine
 app.jinja_env.globals.update(my_url_for=my_url_for)
 app.jinja_env.globals.update(format_url=format_url)
+
+# function for getting results
+def get_results():
+    global results_info
+    global weather_info
+    global events_info
+    results_info, events_info, weather_info = ml_std_req()
 
 
 def login_required(test):
@@ -65,9 +77,11 @@ def login():
         else:
             session['logged_in'] = True
             flash('Welcome')
-
             # get the predictions upon login
+            get_results()
             return redirect(my_url_for('index'))
+    # pop session logged_in prevents user being able to press go back and still login
+    session.pop('logged_in', None)
     return render_template('login.html')
 
 
@@ -79,11 +93,14 @@ def index():
 
 @app.route('/data', methods=['GET'])
 def results():
-    # delete this later on
-    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    with open(os.path.join(location,'results.json'), 'r', encoding='utf-8') as fp:
-        data = fp.read()
-    data = json.loads(data)
-    # end delete
+    return jsonify(orders=results_info)
 
-    return jsonify(orders=data)
+
+@app.route('/events', methods=['GET'])
+def events():
+    return jsonify(events=events_info)
+
+
+@app.route('/weather', methods=['GET'])
+def weather():
+    return jsonify(weather=weather_info)

@@ -11,14 +11,14 @@ import calendar
 from datetime import datetime, timedelta, date
 from xml.etree import ElementTree as ET
 
-# get events data for next 7 days from eventful api
+# get events data for next 14 days from eventful api
 def get_eventful_data(venue_names_path, s_date):
     # save our api key
     app_key = '2J7PsVHMXzdwZHfZ'
 
     # format dates to required scheme for api call
     from_date = s_date.strftime("%Y%m%d") + "00"
-    to_date = (s_date + timedelta(days=7)).strftime("%Y%m%d") + "00"
+    to_date = (s_date + timedelta(days=13)).strftime("%Y%m%d") + "00"
 
     # open file that contains venue ids
     with open(venue_names_path, encoding='utf-8') as data_file:
@@ -26,6 +26,7 @@ def get_eventful_data(venue_names_path, s_date):
 
     # create empty list for dates
     event_dates = []
+    event_info = []
 
     # for each venue in our list
     for venue in venues:
@@ -53,7 +54,12 @@ def get_eventful_data(venue_names_path, s_date):
             # get start end end dates
             start_date = event.find("start_time").text
             end_date = event.find("stop_time").text
-
+            # get event info for displaying it later on
+            event_title = event.find("title").text
+            event_url = event.find("url").text
+            end_string = "" if end_date is None else end_date
+            event = {"start": start_date, "end": end_date, "venue": venue_name, "title": event_title, "url": event_url}
+            event_info.append(event);
             # if there is no end date then we know that this event is on one day only
             if end_date is None:
                 dates.add(start_date.split(" ")[0])
@@ -78,10 +84,10 @@ def get_eventful_data(venue_names_path, s_date):
         # append set to list of dates with the venue's name
         event_dates.append((venue_name, dates))
 
-    return event_dates
+    return event_dates, event_info
 
 
-# get weather data for the next 7 days from worldweatheronline.com api
+# get weather data for the next 14 days from worldweatheronline.com api
 def get_weather_data():
     # define parameters for api call
     location = 'NG1'
@@ -97,20 +103,25 @@ def get_weather_data():
 
     # create dictionary for extracting only info that we need
     weather_data = {}
-
+    # create list for storing weather info
+    weather_info = []
     # each day in response
     for entry in response['data']['weather']:
+        w_info = {}
         # get the information that we are interested at
-        date_string = entry['date']
-        cloud_cover = entry['hourly'][0]['cloudcover']
-        temp = entry['hourly'][0]['FeelsLikeC']
-        precip = entry['hourly'][0]['precipMM']
-        wind_speed = entry['hourly'][0]['windspeedKmph']
+        w_info['date'] = date_string = entry['date']
+        w_info['cloud'] = cloud_cover = entry['hourly'][0]['cloudcover']
+        w_info['temp'] = temp = entry['hourly'][0]['FeelsLikeC']
+        w_info['precip'] = precip = entry['hourly'][0]['precipMM']
+        w_info['wind'] = wind_speed = entry['hourly'][0]['windspeedKmph']
+        w_info['description'] = entry['hourly'][0]['weatherDesc'][0]['value']
+        w_info['icon'] = entry['hourly'][0]['weatherIconUrl'][0]['value']
 
         # add the info as a list to dict with key of the day's date
         weather_data[date_string] = [float(cloud_cover), float(temp), float(precip), float(wind_speed)]
+        weather_info.append(w_info)
 
-    return weather_data
+    return weather_data, weather_info
 
 
 # load uni key dates
@@ -206,7 +217,7 @@ def load_bank_holidays(file_path):
 
 def main(start_date, days):
     # paths for resources
-    data_dir_path = 'data' + os.sep
+    data_dir_path = os.path.dirname(os.path.realpath(__file__)) + os.sep + 'data' + os.sep
     daily_sales_path = data_dir_path + 'daily_sale_figures.json'
     bank_holiday_path = data_dir_path + 'england_bankHolidays.json'
     city_days_path = data_dir_path + 'nottcity_SchoolHolidays.json'
@@ -227,8 +238,8 @@ def main(start_date, days):
     s_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
     # get data from apis
-    weather_data = get_weather_data()
-    events_data = get_eventful_data(venue_names_path, s_date)
+    weather_data, weather_info = get_weather_data()
+    events_data, event_info = get_eventful_data(venue_names_path, s_date)
 
     # create empty list for values
     data = []
@@ -299,8 +310,7 @@ def main(start_date, days):
         # append target value
         data[i].append(0)
 
-    return data
-
+    return data, event_info, weather_info
 
 if __name__ == '__main__':
     main()

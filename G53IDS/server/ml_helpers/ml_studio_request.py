@@ -10,15 +10,15 @@ Note: the code was taken from Azure's ML Studio web service information page and
 import json
 import requests
 from datetime import date, timedelta
-from collect_features import main as collect_features
-
+from operator import itemgetter
+from server.ml_helpers.collect_features import main as collect_features
 
 def main():
     # get the features for 14 days from tomorrow
     start_date = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
     days = 14
     # get the features to be passed in with api call
-    values = collect_features(start_date, days)
+    values, event_info, weather_info = collect_features(start_date, days)
 
     # prepare API call body
     data = {
@@ -53,19 +53,18 @@ def main():
         results = []
         for item in response['Results']['output1']['value']['Values']:
             # create a list of tuples (date, item_name, predicted_quantity)
-            entry = (item[1], item[0], round(float(item[2]), 2))
+            entry = {'date': item[1], 'name': item[0], 'quantity': round(float(item[2]), 2)}
             results.append(entry)
-        # sort list of tuples
-        results.sort()
-
-        return results, start_date
+        # sort list of dict
+        results = sorted(results, key=itemgetter('date'))
+        event_info = sorted(event_info, key=itemgetter('start'))
+        weather_info = sorted(weather_info, key=itemgetter('date'))
+        return results, event_info, weather_info
 
     # handle errors
     except requests.HTTPError as error:
         print(("The request failed with status code: " + str(error.code)))
         # Print the headers - they include the request ID and the timestamp, which are useful for debugging the failure
-        print((error.info()))
-
 
 if __name__ == '__main__':
     main()
