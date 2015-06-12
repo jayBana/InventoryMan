@@ -1,9 +1,9 @@
-myApp.controller('OrdersListCtrl', ['$scope', '$filter', 'Data', 'ngTableParams', function ($scope, $filter, Data, ngTableParams) {
+myApp.controller('OrdersListCtrl', ['$scope', 'Data', 'ngTableParams', function ($scope, Data, ngTableParams) {
     var tomorrow = moment().add(1, 'd');
     $scope.start_date = tomorrow.format("YYYY-MM-DD");
     $scope.end_date = tomorrow.add(6, 'd').format("YYYY-MM-DD");
 
-    Data.get().then(function (data) {
+    Data.get("data").then(function (data) {
         $scope.data = data.orders;
         $scope.tableParams = new ngTableParams({
             page: 1,            // show first page

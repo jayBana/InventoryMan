@@ -16,3 +16,9 @@ $('#login-btn').click(function () {
         size: "25%"
     });
 });
+
+// change active class of navbar items
+$(".nav a").on("click", function(){
+   $(".nav").find(".active").removeClass("active");
+   $(this).parent().addClass("active");
+});

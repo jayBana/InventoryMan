@@ -4,6 +4,7 @@ body {
     font-family: sans-serif;
 }
 
+
 .panel {
     height: 100%;
 }
@@ -12,4 +13,21 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+}
+
+.table tbody>tr>td.vert-align{
+    vertical-align: middle;
+}
+
+.navbar-inverse .navbar-header .navbar-brand:hover{
+    color: #dddddd;
+}
+
+.navbar-inverse .navbar-nav .active {
+    background: #5486b7;
+}
+
+#weather-icon {
+    width: 30px;
+    height: 30px;
 }

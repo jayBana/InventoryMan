@@ -1,0 +1,51 @@
+<h3>Upcoming 14 days...</h3>
+<span><div class="text-right">
+    <small><i>Powered by:&nbsp<a href="http://www.eventful.com/">eventful.com</a></i>
+    </small>
+</div></span>
+<div class="table-responsive">
+    <div class="panel panel-primary">
+        <div class="panel-heading">Nearby events</div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <tr>
+                    <th ng-repeat="h in e_headers" class="text-center">{{ h.text }}</th>
+                </tr>
+                <tr ng-repeat="e in events" class="text-center">
+                    <td class="vert-align">{{ getStartDate(e.start) }} <br> <strong>{{ getTime(e.start) }}</strong></td>
+                    <td class="vert-align">{{ getDay(getStartDate(e.start)) }}</td>
+                    <td class="vert-align">{{ getEndDate(e.start,e.end) }}</td>
+                    <td class="vert-align">{{ e.venue }}</td>
+                    <td class="vert-align"><a href="{{ e.url }}">{{ e.title }}</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<span><div class="text-right">
+    <small><i>Powered by:&nbsp<a href="http://www.worldweatheronline.com//">worldweatheronline.com</a></i>
+    </small>
+</div></span>
+<div class="table-responsive">
+    <div class="panel panel-primary">
+        <div class="panel-heading">Weather information:</div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <tr>
+                    <th ng-repeat="h in w_headers" class="text-center">{{ h.text }}</th>
+                </tr>
+                <tr ng-repeat="w in weather" class="text-center">
+                    <td class="vert-align"><img src="{{ w.icon }}" id="weather-icon"></td>
+                    <td class="vert-align">{{ w.date }}</td>
+                    <td class="vert-align">{{ getDay(w.date) }}</td>
+                    <td class="vert-align">{{ w.description }}</td>
+                    <td class="vert-align">{{ w.temp }}</td>
+                    <td class="vert-align">{{ w.precip }}</td>
+                    <td class="vert-align">{{ w.wind }}</td>
+                    <td class="vert-align">{{ w.cloud }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
