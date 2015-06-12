@@ -180,3 +180,7 @@ crashlytics-build.properties
 pyvenv.cfg
 pip-selfcheck.json
 
+### Own ignore settings ###
+!data/peData/
+data/peData/*
+data/peData/daily_summed_usage/

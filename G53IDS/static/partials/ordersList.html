@@ -1,0 +1,46 @@
+<my-date-picker></my-date-picker>
+<br>
+<h4>Predicted demand for {{ start_date }} - {{ end_date }}</h4>
+
+<!-- dynamic ng-table for predictions -->
+<!-- created by modifying the code from ng-table's documentation -->
+<div class="table-responsive">
+    <div class="panel panel-primary">
+        <div class="panel-heading">List of items:</div>
+        <div class="panel-body">
+            <table ng-table="tableParams" class="table table-striped">
+                <!-- create groups and their "headers" -->
+                <tbody ng-repeat="group in $groups" ng-controller="groupCtrl">
+                <tr class="ng-table-group">
+                    <td>
+                        <a href="" ng-click="group.$hideRows = !group.$hideRows">
+                            <span class="glyphicon"
+                                  ng-class="{ 'glyphicon-chevron-right': group.$hideRows, 'glyphicon-chevron-down': !group.$hideRows }"></span>
+                            <strong>{{ group.value }}</strong>
+                        </a>
+                    </td>
+                    <td>
+                        <!-- calculate the filtered rows total here -->
+                    </td>
+                    <td class="text-center">
+                        <div><strong class="text-success">Total:</strong>&nbsp{{ calcSum(filteredItems) }}</div>
+                    </td>
+                </tr>
+                <!-- hide rows, when the group is not expanded -->
+                <!-- insert rows in table with custom filter based on the input from the datepicker -->
+                <tr ng-hide="group.$hideRows" ng-repeat="item in (filteredItems = (group.data|dateRange:start_date:end_date))">
+                <td data-title="'Date'" class="text-center">
+                    {{ item.date }}
+                </td>
+                <td data-title="'Day'" class="text-center">
+                    {{ getDay(item.date) }}
+                </td>
+                <td data-title="'Quantity'" class="text-center">
+                    {{ item.quantity }}
+                </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
