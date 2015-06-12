@@ -16,11 +16,6 @@ myApp.controller('InfoListCtrl', ['$scope', 'Data', function ($scope, Data) {
         {text: "Cloud Cover (%)"}
     ]
 
-    // get the day name
-    $scope.getDay = function (date) {
-        return moment(date).get().format('dddd');
-    }
-
     // get data from server for events
     Data.get('events').then(function (data) {
         $scope.events = data.events;
@@ -35,9 +30,14 @@ myApp.controller('InfoListCtrl', ['$scope', 'Data', function ($scope, Data) {
         {text: "Title"}
     ]
 
+    // get the day name
+    $scope.getDay = function (date) {
+        return moment(date).get().format('dddd');
+    }
+
     // get start date by splitting string and removing hr:min:sec
     $scope.getStartDate = function (date) {
-        if (date === null){
+        if (date === null) {
             return;
         }
         var d = date.split(" ");
@@ -46,8 +46,8 @@ myApp.controller('InfoListCtrl', ['$scope', 'Data', function ($scope, Data) {
 
     // get end date by splitting string and removing hr:min:sec
     // we only want end dates for events that are on for more than one day
-    $scope.getEndDate = function(sdate, edate){
-        if (edate === null || sdate.substring(0, 10) === edate.substring(0,10)) {
+    $scope.getEndDate = function (sdate, edate) {
+        if (edate === null || sdate.substring(0, 10) === edate.substring(0, 10)) {
             return
         }
         var d = edate.split(" ");
