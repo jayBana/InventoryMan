@@ -3,6 +3,7 @@ myApp.controller('OrdersListCtrl', ['$scope', 'Data', 'ngTableParams', function 
     $scope.start_date = tomorrow.format("YYYY-MM-DD");
     $scope.end_date = tomorrow.add(6, 'd').format("YYYY-MM-DD");
 
+    // get the data from the server
     Data.get("data").then(function (data) {
         $scope.data = data.orders;
         $scope.tableParams = new ngTableParams({
@@ -18,7 +19,12 @@ myApp.controller('OrdersListCtrl', ['$scope', 'Data', 'ngTableParams', function 
         });
     });
 
+    // get the day name
+    $scope.getDay = function (date) {
+        return moment(date).get().format('dddd');
+    }
 
+    // calculate the sum of each item dynamically
     $scope.calcSum = function (data) {
         var sum = 0;
         angular.forEach(data, function (item) {
@@ -26,6 +32,9 @@ myApp.controller('OrdersListCtrl', ['$scope', 'Data', 'ngTableParams', function 
         });
         return Math.ceil(sum).toLocaleString();
     }
-}]).controller('groupCtrl', function($scope) {
+
+
+    // prevents the expansion of groups on startup
+}]).controller('groupCtrl', function ($scope) {
     $scope.group.$hideRows = true;
 });

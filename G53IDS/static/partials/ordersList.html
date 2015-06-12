@@ -1,6 +1,6 @@
 <my-date-picker></my-date-picker>
 <br>
-<h4>Order list for {{ start_date }} - {{ end_date }}</h4>
+<h4>Predicted demand for {{ start_date }} - {{ end_date }}</h4>
 
 <div class="table-responsive">
     <div class="panel panel-primary">
@@ -16,6 +16,9 @@
                             <strong>{{ group.value }}</strong>
                         </a>
                     </td>
+                    <td>
+
+                    </td>
                     <td class="text-center">
                         <div><strong class="text-success">Total:</strong>&nbsp{{ calcSum(filteredItems) }}</div>
                     </td>
@@ -24,6 +27,9 @@
                     ng-repeat="item in (filteredItems = (group.data|dateRange:start_date:end_date))">
                     <td data-title="'Date'" class="text-center">
                         {{ item.date }}
+                    </td>
+                    <td data-title="'Day'" class="text-center">
+                        {{ getDay(item.date) }}
                     </td>
                     <td data-title="'Quantity'" class="text-center">
                         {{ item.quantity }}
