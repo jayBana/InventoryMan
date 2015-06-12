@@ -312,5 +312,6 @@ def main(start_date, days):
 
     return data, event_info, weather_info
 
+
 if __name__ == '__main__':
     main()

@@ -1,6 +1,8 @@
+// main app module and with injected components
 var myApp = angular.module('myApp', ['ngRoute', 'ui.bootstrap', 'ngAnimate', 'ngTable', 'ngResource']);
 
 myApp.config(['$routeProvider', function ($routeProvider) {
+    // set up routing
     $routeProvider.
         when('/', {
             title: 'Orders',

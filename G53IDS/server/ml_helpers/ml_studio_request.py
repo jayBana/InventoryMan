@@ -13,6 +13,7 @@ from datetime import date, timedelta
 from operator import itemgetter
 from server.ml_helpers.collect_features import main as collect_features
 
+
 def main():
     # get the features for 14 days from tomorrow
     start_date = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -65,6 +66,7 @@ def main():
     except requests.HTTPError as error:
         print(("The request failed with status code: " + str(error.code)))
         # Print the headers - they include the request ID and the timestamp, which are useful for debugging the failure
+
 
 if __name__ == '__main__':
     main()

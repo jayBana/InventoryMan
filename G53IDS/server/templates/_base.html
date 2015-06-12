@@ -1,3 +1,4 @@
+<!-- the main file used with every page -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,6 +11,7 @@
 </head>
 <body>
 <!--- nav bar--->
+<!--- only show certain elements when logged in--->
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -19,7 +21,7 @@
                 <span class="icon-bar"></span>
             </button>
             {% if session.logged_in %}
-                    <a class="navbar-brand" href="{{ my_url_for('index') }}">InventoryMan</a>
+                <a class="navbar-brand" href="{{ my_url_for('index') }}">InventoryMan</a>
             {% else %}
                 <div class="navbar-brand">InventoryMan</div>
             {% endif %}
@@ -39,6 +41,7 @@
     </div>
 </div>
 <!--- Main container--->
+<!--- This were messages are flashed to the user--->
 <div class="container">
     <div class="content" data-ng-app="myApp">
         {% for message in get_flashed_messages() %}

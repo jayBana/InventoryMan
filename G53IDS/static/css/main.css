@@ -1,10 +1,11 @@
+/*padding is needed from top, otherwise don't see flashed messages*/
 body {
     padding-top: 70px;
     background: #ffffff;
     font-family: sans-serif;
 }
 
-
+/*override some bootstrap style*/
 .panel {
     height: 100%;
 }
@@ -15,11 +16,13 @@ body {
     padding: 0;
 }
 
-.table tbody>tr>td.vert-align{
+/*vertical align cells in tables*/
+.table tbody > tr > td.vert-align {
     vertical-align: middle;
 }
 
-.navbar-inverse .navbar-header .navbar-brand:hover{
+/*make active tab more prominent in navigation bar*/
+.navbar-inverse .navbar-header .navbar-brand:hover {
     color: #dddddd;
 }
 
@@ -27,6 +30,7 @@ body {
     background: #5486b7;
 }
 
+/*resize icons in weather info table*/
 #weather-icon {
     width: 30px;
     height: 30px;

@@ -32,6 +32,7 @@ def my_url_for(*args, **kwargs):
         return url
 
 
+# custom url formater function used in html templates
 def format_url(url):
     return '//localhost:{}/'.format(app.config['PORT']) + url + '/'
 
@@ -47,6 +48,7 @@ def get_results():
     results_info, events_info, weather_info = ml_std_req()
 
 
+# wrapped login function
 def login_required(test):
     @wraps(test)
     def wrap(*args, **kwargs):
@@ -67,13 +69,16 @@ def lougout():
     return redirect(my_url_for('login'))
 
 
+# landing (login) page
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        # check credentials against the ones stored in the config file
         if request.form['username'] != app.config['USERNAME'] or request.form['password'] != app.config['PASSWORD']:
             error = 'Invalid login. Try again!'
             return render_template('login.html', error=error)
         else:
+            # successful login
             session['logged_in'] = True
             flash('Welcome')
             # get the predictions upon login
@@ -84,22 +89,26 @@ def login():
     return render_template('login.html')
 
 
+# index page, showing today's date
 @app.route('/index/', methods=['GET'])
 def index():
     today = date.today().strftime("%Y-%m-%d")
     return render_template('index.html', today=today)
 
 
+# return prediction results as json
 @app.route('/data', methods=['GET'])
 def results():
     return jsonify(orders=results_info)
 
 
+# return events info as json
 @app.route('/events', methods=['GET'])
 def events():
     return jsonify(events=events_info)
 
 
+# return weather info as json
 @app.route('/weather', methods=['GET'])
 def weather():
     return jsonify(weather=weather_info)

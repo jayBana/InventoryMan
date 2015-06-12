@@ -6,8 +6,9 @@
     <form class="form-signin" method="post" action="/">
         <span>Username: <input type="text" name="username" value="{{ request.form.username }}"></span>
         <span>Password: <input type="password" name="password" value="{{ request.form.password }}"></span>
-        <input class="btn btn-sm btn-success" id="login-btn" type="submit" value="Login" >
+        <input class="btn btn-sm btn-success" id="login-btn" type="submit" value="Login">
     </form>
     <p><em>Use 'admin' for the username and password.</em></p>
+    <!-- The splash screen div -->
     <div id="loading" style="display:none"></div>
 {% endblock %}
