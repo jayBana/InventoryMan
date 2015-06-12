@@ -1,7 +1,6 @@
 # needed import for flask-triangle to work
 import os
 import builtins
-import json
 from functools import wraps
 from datetime import date
 
