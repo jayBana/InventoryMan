@@ -94,7 +94,7 @@ def get_weather_data():
     time_interval = '24'
     date = 'today'
     format = 'json'
-    api_key = 'e0d7bc79d0cd8d25a73fff5f3fbb8'
+    api_key = '8ebb2d4e97ad4937f71b095f10e40'
     url = 'http://api.worldweatheronline.com/premium/v1/weather.ashx?' + 'q=' + location + '&date=' + date + \
           '&tp=' + time_interval + '&format=' + format + '&key=' + api_key
 
