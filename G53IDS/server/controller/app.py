@@ -28,13 +28,18 @@ def my_url_for(*args, **kwargs):
         url = url_for(*args, **kwargs)  # Get the URL
         if app.config['PORT'] is not None:  # If we have a port, we should do something
             url = url.replace('://localhost/',
-                              '://localhost:%d/' % (app.config['PORT']))  # Oh yeah, add the port to the URL
+                              '://%s:%d/' % (app.config['IP'], app.config['PORT']))  # Oh yeah, add the port to the URL
+        else:
+            url = url.replace('://localhost/',
+                              '://%s/' % (app.config['IP']))
         return url
-
 
 # custom url formater function used in html templates
 def format_url(url):
-    return '//localhost:{}/'.format(app.config['PORT']) + url + '/'
+    if app.config['PORT'] is not None:
+        return '//{}:{}/'.format(app.config['IP'], app.config['PORT']) + url + '/'
+    else:
+        return '//{}/'.format(app.config['IP']) + url + '/'
 
 # add helper functions to jinja2 templating engine
 app.jinja_env.globals.update(my_url_for=my_url_for)

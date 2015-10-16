@@ -12,3 +12,4 @@ DEBUG = False
 
 # port needs to be defined if we want to run in Vagrant
 PORT = 8080
+IP = "192.168.99.101"
