@@ -176,7 +176,7 @@ crashlytics-build.properties
 .Python
 [Bb]in
 [Ii]nclude
-[Ll]ib
+# [Ll]ib
 pyvenv.cfg
 pip-selfcheck.json
 
@@ -184,3 +184,4 @@ pip-selfcheck.json
 !data/peData/
 data/peData/*
 data/peData/daily_summed_usage/
+!G53IDS/static/lib/
